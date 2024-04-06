@@ -43,7 +43,7 @@ application {
 }
 
 runtime {
-    options = listOf("--compress", "2", "--no-header-files", "--no-man-pages")
+    options = listOf("--compress", "zip-9", "--no-header-files", "--no-man-pages")
     addModules("java.base", "java.logging", "java.management")
     val jdkVersion = "zulu21.32.17-ca-jdk21.0.2"
     targetPlatform("linux_x64") {
