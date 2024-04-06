@@ -14,12 +14,10 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 21
@@ -27,7 +25,6 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
-
     # Configure Gradle for optimal use in GiHub Actions, including caching of downloaded dependencies.
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Setup Gradle
@@ -38,11 +35,9 @@ jobs:
       run: chmod +x gradlew && ./gradlew test
 
   dependency-submission:
-
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 21
