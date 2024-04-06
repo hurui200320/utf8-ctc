@@ -24,6 +24,7 @@ fun compress(input: ByteArray): ByteArray {
         val n: Int = deflater.deflate(buffer)
         baos.write(buffer, 0, n)
     }
+    deflater.end()
     return baos.toByteArray()
 }
 
@@ -36,5 +37,6 @@ fun decompress(input: ByteArray): ByteArray {
         val n: Int = inflater.inflate(buffer)
         baos.write(buffer, 0, n)
     }
+    inflater.end()
     return baos.toByteArray()
 }
