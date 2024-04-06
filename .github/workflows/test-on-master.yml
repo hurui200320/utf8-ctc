@@ -9,7 +9,7 @@ name: Run unit test when push/pr to master
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "develop" ]
   pull_request:
     branches: [ "master" ]
 
