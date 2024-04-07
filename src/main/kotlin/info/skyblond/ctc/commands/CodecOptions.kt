@@ -31,11 +31,13 @@ class CodecOptions: OptionGroup(
     val charset: Charset by option("-c", "--charset")
         .convert { Charset.forName(it) }
         .default(
-            when (Locale.getDefault().toLanguageTag()) {
-                "zh-CN" -> Charset.forName("GBK")
-                "zh-TW" -> Charset.forName("BIG5")
-                else -> StandardCharsets.UTF_8
-            }
+            if (System.getProperty("os.name").lowercase().startsWith("windows")) {
+                when (Locale.getDefault().toLanguageTag()) {
+                    "zh-CN" -> Charset.forName("GBK")
+                    "zh-TW" -> Charset.forName("BIG5")
+                    else -> StandardCharsets.UTF_8
+                }
+            } else StandardCharsets.UTF_8
         )
         .help {
             "Use specific charset for input and output. For windows, " +
