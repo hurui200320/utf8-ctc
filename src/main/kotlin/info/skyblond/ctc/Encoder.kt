@@ -56,7 +56,9 @@ object Encoder {
     }
 
     fun String.encodeCTC(): List<Int> {
-        var fixedStr = this.replace("\n", Constants.NEW_LINE_CHAR)
+        var fixedStr = this
+            .replace("\r", "")
+            .replace("\n", Constants.NEW_LINE_CHAR)
         Constants.fixMappings.forEach { (from, to) ->
             fixedStr = fixedStr.replace(from, to)
         }
