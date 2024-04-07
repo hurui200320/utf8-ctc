@@ -32,10 +32,6 @@ to write them on the postcard.
 When someone got the postcard, he can type in the numbers and the program will
 print out the decoded message.
 
-> There is no encryption feature for now.
-> Maybe I will implement one later, but only if the output length is relatively short.
-> I don't want to write millions of digits.
-
 ## Usage
 
 The program is built using jlink with zulu 21 jdk, so technically you don't need
@@ -96,6 +92,29 @@ Keep typing numbers and you're good.
 ```bash
 ./ctc decode -t "1131, 0561, 2676, 7230, 4767, 9976, 5363, 5212, 0701, 5934, 1226, 9975"
 ```
+
+### Encryption
+
+Starting from v0.1.0, I added a Transposition Cipher using VMPC random generator.
+It supports symmetric encryption (offers only the `-k string` option) and 
+asymmetric encryption (offering both `-k string` and `--dh hex`) to use X25519 ECDH.
+
+When using symmetric encryption, the key from `-k key` will be encoded using UTF-8
+and apply SH3-256.
+The result hash will be used as the seed of VMPC generator.
+
+When using asymmetric encryption, the key will be encoded by UTF-8 and apply SHA3-256.
+Then use is as our private key to perform X25519 ECDH, the result will be hashed by
+SHA3-256, and the hash will be used as the encryption key.
+
+Use `./ctc pubkey key` to calculate the public key when using `-k key`. 
+
+The encryption is based on Transposition Cipher.
+The implementation is `#randomize` and `#derandomize` in [Utils.kt](./src/main/kotlin/info/skyblond/ctc/Utils.kt) 
+
+One time of randomization is not safe.
+So you can use `-n` to set the iteration amount.
+By default, it's 1.2 million times.
 
 ## Internal design
 

@@ -16,6 +16,7 @@ repositories {
 dependencies {
     implementation("com.github.ajalt.clikt:clikt:4.3.0")
     implementation("com.github.ajalt.mordant:mordant:2.4.0")
+    implementation("org.bouncycastle:bcprov-jdk18on:1.78")
 
     testImplementation("org.jsoup:jsoup:1.17.2")
     testImplementation(kotlin("test"))

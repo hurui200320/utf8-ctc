@@ -10,7 +10,8 @@ object MainCommand : CliktCommand(
     init {
         subcommands(
             DecodeCommand,
-            EncodeCommand
+            EncodeCommand,
+            PrintPubKeyCommand,
         )
     }
 
