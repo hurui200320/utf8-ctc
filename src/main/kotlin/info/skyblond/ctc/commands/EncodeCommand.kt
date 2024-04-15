@@ -3,7 +3,7 @@ package info.skyblond.ctc.commands
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
-import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.defaultLazy
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
@@ -19,8 +19,8 @@ object EncodeCommand : CliktCommand(
     private val codecOptions by CodecOptions()
 
     private val codePerLine by option("--code-per-line", "-w")
-        .int().default(5)
-        .help { "How many code to print in one line (at most), by default is `5`. Use `-1` to disable formatting." }
+        .int().defaultLazy { terminal.info.width / 6 }
+        .help { "How many code to print in one line, by default fit your terminal. Use `-1` to disable formatting." }
 
 
     override fun run() {
@@ -28,7 +28,6 @@ object EncodeCommand : CliktCommand(
             ?: codecOptions.file?.readText()
             ?: askContent(codecOptions.eof, codecOptions.charset)
         var codes = content.encodeCTC()
-        val width = (terminal.info.width / 6).coerceAtMost(codePerLine)
         val secret = codecOptions.getSecret()
         if (secret != null) {
             codes = codes.randomize(
@@ -38,8 +37,8 @@ object EncodeCommand : CliktCommand(
         }
 
         codes.toCTCString().let { s ->
-            if (width > 0) {
-                s.chunked(width * 6).forEach {
+            if (codePerLine > 0) {
+                s.chunked(codePerLine * 6).forEach {
                     echo(it)
                 }
             } else {
