@@ -3,7 +3,6 @@ package info.skyblond.ctc.commands
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
-import com.github.ajalt.clikt.parameters.options.check
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
@@ -21,9 +20,7 @@ object EncodeCommand : CliktCommand(
 
     private val codePerLine by option("--code-per-line", "-w")
         .int().default(5)
-        .help { "How many code to print in one line (at most), by default is `5`" }
-        .check { it > 0 }
-
+        .help { "How many code to print in one line (at most), by default is `5`. Use `-1` to disable formatting." }
 
 
     override fun run() {
@@ -40,8 +37,14 @@ object EncodeCommand : CliktCommand(
             )
         }
 
-        codes.toCTCString().chunked(width * 6).forEach {
-            echo(it)
+        codes.toCTCString().let { s ->
+            if (width > 0) {
+                s.chunked(width * 6).forEach {
+                    echo(it)
+                }
+            } else {
+                echo(s)
+            }
         }
     }
 }
