@@ -63,8 +63,8 @@ You can change the `EOF` to something else using `--eof=EOT`, now you can use `E
 instead of `EOF`.
 
 You can also change how many codes are printed in one line.
-But do be aware this is limited by your terminal width.
-By default, it's five codes per line.
+But do be aware this is limited by your terminal width, if it's longer than the width, it will wrap.
+By default, it's fit your terminal.
 You can change it by option `-w 6`, now you have six codes per line.
 
 When using stdin input, there is some issue with the charset on Windows.
