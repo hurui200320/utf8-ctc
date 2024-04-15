@@ -45,25 +45,30 @@ object Decoder {
         } else error("The input is not UTF8 encoded: $startFlag")
     }
 
-    private fun decode(codes: List<Int>): String {
+    private fun decode(codes: List<Int>, ignoreError: Boolean): String {
         val sb = StringBuilder()
         val codesBuffer = codes.toMutableList()
 
         while (codesBuffer.isNotEmpty()) {
             val c = codesBuffer.removeFirst()
-            if (c == Constants.UTF8_START || c == Constants.UTF8_COMPRESSED_START) {
-                codesBuffer.addFirst(c)
-                sb.append(codesBuffer.decodeUTF8())
-            } else if (codeToChar.containsKey(c)) {
-                sb.append(codeToChar[c]!!)
-            } else error("Unknown code: $c")
+            try {
+                if (c == Constants.UTF8_START || c == Constants.UTF8_COMPRESSED_START) {
+                    codesBuffer.addFirst(c)
+                    sb.append(codesBuffer.decodeUTF8())
+                } else if (codeToChar.containsKey(c)) {
+                    sb.append(codeToChar[c]!!)
+                } else error("Unknown code: $c")
+            } catch (t: Throwable) {
+                if (!ignoreError) throw t
+                else sb.append("\u25a1")
+            }
         }
 
         return sb.toString()
     }
 
-    fun List<Int>.decodeCTC(): String {
-        var str = decode(this).replace(Constants.NEW_LINE_CHAR, "\n")
+    fun List<Int>.decodeCTC(ignoreError: Boolean): String {
+        var str = decode(this, ignoreError).replace(Constants.NEW_LINE_CHAR, "\n")
         Constants.reverseFixMappings.forEach { (from, to) ->
             str = str.replace(from, to)
         }
