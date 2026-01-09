@@ -153,6 +153,33 @@ will be representing in 0000 to 9991, like base9992 but all in numbers.
 For compressed UTF-8 bytes, it will be enclosed with `9994` and `9995`.
 The content representation is the same.
 
+## Checksum
+
+To ensure the integrity of the encoded data and also to ensure the typing is correct,
+I added a checksum at the end of each encoded line.
+
+For example, the text `天匠染青红，花腰呈袅娜。` corresponding to the following code:
+
+```
+1131  0561  2676  7230
+4767  9976  5363  5212
+0701  5934  1226  9975
+```
+
+When printing out each line, the ISO 7064 mod 97–10 checksum will be appended to the end.
+So the actual output will be (use `-w 4` to specify 4 codes per line):
+
+```
+1131  0561  2676  7230   17
+4767  9976  5363  5212   92
+0701  5934  1226  9975   62
+```
+
+***When decoding, the checksum is always REQUIRED.*** If you don't know/have the checksum,
+or the checksum is blurred and is indistinguishable, just use `00` (must be two digits).
+Also, the line break is also required since the decoding process will check each line separately.
+So you can't mix two lines into one. You have to type them as-is (blank chars are ok, they will be ignored).
+
 ## Contributes
 
 Welcome, but I can't guarantee if I accept the pr or not.

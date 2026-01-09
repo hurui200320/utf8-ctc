@@ -27,10 +27,10 @@ fun loadCTC(): Map<Int, String> =
     }
 
 /**
- * Print in CTC code format: `XXXX, XXXX, XXXX`
+ * Print in CTC code format: `XXXX  XXXX  XXXX`
  * */
 fun List<Int>.toCTCString(): String =
-    this.joinToString { "%04d".format(it) }
+    this.joinToString("  ") { "%04d".format(it) }
 
 /**
  * Calculate the SHA3-256 hash of the [ByteArray].

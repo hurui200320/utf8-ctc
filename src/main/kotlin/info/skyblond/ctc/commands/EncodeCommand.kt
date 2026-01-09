@@ -40,12 +40,12 @@ object EncodeCommand : CliktCommand(
 
         codes.toCTCString().let { s ->
             if (codePerLine > 0) {
-                s.chunked(codePerLine * 6).forEach {
-                    echo(it)
-                }
+                s.chunked(codePerLine * 6)
             } else {
-                echo(s)
+                listOf(s)
             }
+        }.forEach {
+            echo(it.trim() + "   " + generateISO7064(it))
         }
     }
 }

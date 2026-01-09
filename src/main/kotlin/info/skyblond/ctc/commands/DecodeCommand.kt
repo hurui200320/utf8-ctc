@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import info.skyblond.ctc.createChacha20CodeSeq
 import info.skyblond.ctc.decodeCTC
 import info.skyblond.ctc.decrypt
+import info.skyblond.ctc.verifyISO7064
 
 object DecodeCommand : CliktCommand(
     name = "decode"
@@ -23,11 +24,23 @@ object DecodeCommand : CliktCommand(
         .help { "Ignore error and keep decoding. Default: `false`" }
 
     override fun run() {
-        val content = (
-                codecOptions.text
-                    ?: codecOptions.file?.readText()
-                    ?: askContent(codecOptions.eof, codecOptions.charset)
-                ).filter { it in '0'..'9' }
+        val input = (codecOptions.text
+            ?: codecOptions.file?.readText()
+            ?: askContent(codecOptions.eof, codecOptions.charset)).lines()
+
+        val errorLines = input.filterNot {
+            verifyISO7064(it)
+        }
+        errorLines.forEach {
+            echo("Detect error line: $it", err = true)
+        }
+        if (errorLines.isNotEmpty() && !ignoreError) {
+            error("There are errors in the input")
+        }
+
+        val content = input.joinToString("") { line ->
+            line.trim().filter { it in '0'..'9' }.dropLast(2)
+        }
         var codes = content.chunked(4).map { it.toInt() }
 
         val secret = codecOptions.getSecret()
