@@ -144,7 +144,7 @@ text is looking normal.
 When there is an unknown character, it will save to the buffer and encode them in batches.
 For example, when encoding `大家好，my name is XXX。`, the unknown buffer will be `my name is XXX`,
 then it will be encoded to utf-8 bytes.
-The encoded bytes will be compressed by `java.util.zip.Deflater` with max level (9),
+The encoded bytes will be compressed by LZMA2 with preset max and dict size of 256KB,
 and the result will be kept if the compress result is shorter than the raw form.
 
 For raw UTF-8 bytes, it will be enclosed with `9992` and `9993`, the content

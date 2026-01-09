@@ -17,6 +17,7 @@ dependencies {
     implementation("com.github.ajalt.clikt:clikt:5.0.3")
     implementation("com.github.ajalt.mordant:mordant:3.0.2")
     implementation("org.bouncycastle:bcprov-jdk18on:1.83")
+    implementation("org.tukaani:xz:1.11")
 
     testImplementation("org.jsoup:jsoup:1.17.2")
     testImplementation(kotlin("test"))
@@ -27,13 +28,13 @@ tasks.test {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 

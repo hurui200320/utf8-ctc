@@ -8,8 +8,9 @@ class CompressionTest {
     @Test
     fun testCompression(){
         repeat(10) {
-            val data = Random.nextBytes(2047)
+            val data = Random.nextBytes(4095)
             val compressed = compress(data)
+            println(compressed.size)
             val decompressed = decompress(compressed)
             assertArrayEquals(data, decompressed)
         }

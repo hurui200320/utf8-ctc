@@ -33,39 +33,6 @@ fun List<Int>.toCTCString(): String =
     this.joinToString { "%04d".format(it) }
 
 /**
- * Compress the [input] using max level ([Deflater.BEST_COMPRESSION]).
- * */
-fun compress(input: ByteArray): ByteArray {
-    val buffer = ByteArray(1024)
-    val baos = ByteArrayOutputStream()
-    val deflater = Deflater(Deflater.BEST_COMPRESSION)
-    deflater.setInput(input)
-    deflater.finish()
-    while (!deflater.finished()) {
-        val n: Int = deflater.deflate(buffer)
-        baos.write(buffer, 0, n)
-    }
-    deflater.end()
-    return baos.toByteArray()
-}
-
-/**
- * Decompress the [input].
- * */
-fun decompress(input: ByteArray): ByteArray {
-    val buffer = ByteArray(1024)
-    val baos = ByteArrayOutputStream()
-    val inflater = Inflater()
-    inflater.setInput(input)
-    while (!inflater.finished()) {
-        val n: Int = inflater.inflate(buffer)
-        baos.write(buffer, 0, n)
-    }
-    inflater.end()
-    return baos.toByteArray()
-}
-
-/**
  * Calculate the SHA3-256 hash of the [ByteArray].
  * */
 fun ByteArray.sha3(): ByteArray {
