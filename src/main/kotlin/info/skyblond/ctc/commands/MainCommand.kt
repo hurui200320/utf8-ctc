@@ -5,8 +5,9 @@ import com.github.ajalt.clikt.core.subcommands
 
 object MainCommand : CliktCommand(
     name = "ctc",
-    printHelpOnEmptyArgs = true
 ) {
+    override val printHelpOnEmptyArgs = true
+
     init {
         subcommands(
             DecodeCommand,

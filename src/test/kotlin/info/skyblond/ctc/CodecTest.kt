@@ -1,7 +1,5 @@
 package info.skyblond.ctc
 
-import info.skyblond.ctc.Decoder.decodeCTC
-import info.skyblond.ctc.Encoder.encodeCTC
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -32,7 +30,7 @@ class CodecTest {
         println(encoded.toCTCString())
         println("Raw size: ${line.length} chars")
         println("Encoded: ${encoded.size} codes, total ${encoded.size * 4} digits")
-        val decoded = encoded.decodeCTC()
+        val decoded = encoded.decodeCTC(false)
         assertEquals(line, decoded)
     }
 }

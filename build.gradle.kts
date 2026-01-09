@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "2.3.0"
     application
-    id("org.beryx.runtime") version "1.13.1"
+    id("org.beryx.runtime") version "2.0.1"
 }
 
 group = "info.skyblond"
@@ -14,9 +14,10 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.ajalt.clikt:clikt:4.3.0")
-    implementation("com.github.ajalt.mordant:mordant:2.4.0")
-    implementation("org.bouncycastle:bcprov-jdk18on:1.78")
+    implementation("com.github.ajalt.clikt:clikt:5.0.3")
+    implementation("com.github.ajalt.mordant:mordant:3.0.2")
+    implementation("org.bouncycastle:bcprov-jdk18on:1.83")
+    implementation("org.tukaani:xz:1.11")
 
     testImplementation("org.jsoup:jsoup:1.17.2")
     testImplementation(kotlin("test"))
@@ -27,13 +28,13 @@ tasks.test {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 

@@ -1,37 +1,54 @@
 package info.skyblond.ctc.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
-import info.skyblond.ctc.Decoder.decodeCTC
-import info.skyblond.ctc.derandomize
-import info.skyblond.ctc.getRandomIntIter
+import info.skyblond.ctc.createChacha20CodeSeq
+import info.skyblond.ctc.decodeCTC
+import info.skyblond.ctc.decrypt
+import info.skyblond.ctc.verifyISO7064
 
 object DecodeCommand : CliktCommand(
-    name = "decode",
-    help = "Decode text from CTC"
+    name = "decode"
 ) {
+    override fun help(context: Context): String {
+        return "Decode text from CTC"
+    }
+
     private val codecOptions by CodecOptions()
     private val ignoreError by option("-i", "--ignore-error", help = "Ignore error")
         .flag(default = false)
         .help { "Ignore error and keep decoding. Default: `false`" }
 
     override fun run() {
-        val content = (
-                codecOptions.text
-                    ?: codecOptions.file?.readText()
-                    ?: askContent(codecOptions.eof, codecOptions.charset)
-                ).filter { it in '0'..'9' }
+        val input = (codecOptions.text
+            ?: codecOptions.file?.readText()
+            ?: askContent(codecOptions.eof, codecOptions.charset)).lines()
+
+        val errorLines = input.filterNot {
+            verifyISO7064(it)
+        }
+        errorLines.forEach {
+            echo("Detect error line: $it", err = true)
+        }
+        if (errorLines.isNotEmpty() && !ignoreError) {
+            error("There are errors in the input")
+        }
+
+        val content = input.joinToString("") { line ->
+            line.trim().filter { it in '0'..'9' }.dropLast(2)
+        }
         var codes = content.chunked(4).map { it.toInt() }
 
         val secret = codecOptions.getSecret()
         if (secret != null) {
-            codes = codes.derandomize(
-                getRandomIntIter(secret),
-                codecOptions.shuffleIteration
-            )
+            val nonce = codecOptions.getNonce() ?: error("Nonce is required for decryption")
+            codes = codes.asSequence().decrypt(
+                createChacha20CodeSeq(secret, nonce)
+            ).toList()
         }
 
         echo(codes.decodeCTC(ignoreError))
