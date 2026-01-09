@@ -95,26 +95,34 @@ Keep typing numbers and you're good.
 
 ### Encryption
 
-Starting from v0.1.0, I added a Transposition Cipher using VMPC random generator.
-It supports symmetric encryption (offers only the `-k string` option) and 
-asymmetric encryption (offering both `-k string` and `--dh hex`) to use X25519 ECDH.
+Starting from v1.0.0, I removed the old transposition cipher because it's not safe.
+Instead, I added ChaCha20 stream cipher for encryption.
 
-When using symmetric encryption, the key from `-k key` will be encoded using UTF-8
-and apply SH3-256.
-The result hash will be used as the seed of VMPC generator.
+The ChaCha20 stream cipher will generate a stream of fake codes ranged from 0000 to 9999 (key).
+Then for each encoded CTC code, we calculate the encrypted code:
+```
+enc = (code + key) % 10000
+```
 
-When using asymmetric encryption, the key will be encoded by UTF-8 and apply SHA3-256.
-Then use is as our private key to perform X25519 ECDH, the result will be hashed by
-SHA3-256, and the hash will be used as the encryption key.
+When decrypting, the same stream of fake codes will be generated using the same key and nonce:
+```
+code = (enc - key + 10000) % 10000
+```
 
-Use `./ctc pubkey key` to calculate the public key when using `-k key`. 
+The nonce will be generated at the encrypting time, and is required via cli option `--nonce` (`-n` for short).
 
-The encryption is based on Transposition Cipher.
-The implementation is `#randomize` and `#derandomize` in [Utils.kt](./src/main/kotlin/info/skyblond/ctc/Utils.kt) 
+The key (`-k` or `--key`) will be decoded differently depending on the encryption mode.
 
-One time of randomization is not safe.
-So you can use `-n` to set the iteration amount.
-By default, it's 1.2 million times.
+If you use symmetric encryption, the key will be decoded as UTF-8 bytes and apply SH3-256.
+The result will be the ChaCha20 stream key.
+
+If you use asymmetric encryption, the key will be decoded as hex string to be private key,
+then the `--dh hex` option will be used to as your partner's public key (also as hex string).
+Then use X25519 ECDH to generate the shared secret, and then apply SHA3-256.
+The result will be the ChaCha20 stream key.
+
+For asymmetric encryption, to generate the private key, use `openssl rand -hex 32`.
+To get the public key, use `./ctc pubkey <your private key in hex>` to calculate the public key.
 
 ## Internal design
 

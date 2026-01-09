@@ -1,7 +1,5 @@
 package info.skyblond.ctc
 
-import info.skyblond.ctc.Decoder.decodeCTC
-import info.skyblond.ctc.Encoder.encodeCTC
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

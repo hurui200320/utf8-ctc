@@ -1,25 +1,26 @@
 package info.skyblond.ctc.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.defaultLazy
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
-import info.skyblond.ctc.Encoder.encodeCTC
-import info.skyblond.ctc.getRandomIntIter
-import info.skyblond.ctc.randomize
-import info.skyblond.ctc.toCTCString
+import info.skyblond.ctc.*
 
 object EncodeCommand : CliktCommand(
     name = "encode",
-    help = "Encode text into CTC"
 ) {
+    override fun help(context: Context): String {
+        return "Encode text into CTC"
+    }
+
     private val codecOptions by CodecOptions()
 
     private val codePerLine by option("--code-per-line", "-w")
-        .int().defaultLazy { terminal.info.width / 6 }
+        .int().defaultLazy { terminal.size.width / 6 }
         .help { "How many code to print in one line, by default fit your terminal. Use `-1` to disable formatting." }
 
 
@@ -30,10 +31,11 @@ object EncodeCommand : CliktCommand(
         var codes = content.encodeCTC()
         val secret = codecOptions.getSecret()
         if (secret != null) {
-            codes = codes.randomize(
-                getRandomIntIter(secret),
-                codecOptions.shuffleIteration
-            )
+            val nonce = generateNonce()
+            echo("Nonce = ${nonce.toHexString().uppercase().chunked(4).joinToString(" ")}")
+            codes = codes.asSequence().encrypt(
+                createChacha20CodeSeq(secret, nonce)
+            ).toList()
         }
 
         codes.toCTCString().let { s ->

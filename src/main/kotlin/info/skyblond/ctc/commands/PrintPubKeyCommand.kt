@@ -1,6 +1,7 @@
 package info.skyblond.ctc.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.help
 import info.skyblond.ctc.sha3
@@ -8,9 +9,12 @@ import info.skyblond.ctc.toHexString
 import org.bouncycastle.crypto.params.X25519PrivateKeyParameters
 
 object PrintPubKeyCommand: CliktCommand(
-    name = "pubkey",
-    help = "Print the public key of the given private key"
+    name = "pubkey"
 ) {
+    override fun help(context: Context): String {
+        return "Print the public key of the given private key"
+    }
+
     private val key by argument("key")
         .help { "Your private key" }
 
