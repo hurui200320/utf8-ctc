@@ -6,10 +6,7 @@ import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
-import info.skyblond.ctc.createChacha20CodeSeq
-import info.skyblond.ctc.decodeCTC
-import info.skyblond.ctc.decrypt
-import info.skyblond.ctc.verifyISO7064
+import info.skyblond.ctc.*
 
 object DecodeCommand : CliktCommand(
     name = "decode"
@@ -46,6 +43,10 @@ object DecodeCommand : CliktCommand(
         val secret = codecOptions.getSecret()
         if (secret != null) {
             val nonce = codecOptions.getNonce() ?: error("Nonce is required for decryption")
+            val sipHashKey = secret.hkdfSipHashKey()
+            val mac = codecOptions.getMac() ?: error("MAC is required for decryption")
+            val calculatedSipHash = codes.sipHash(sipHashKey)
+            require(calculatedSipHash.contentEquals(mac)) { "MAC mismatch" }
             codes = codes.asSequence().decrypt(
                 createChacha20CodeSeq(secret, nonce)
             ).toList()

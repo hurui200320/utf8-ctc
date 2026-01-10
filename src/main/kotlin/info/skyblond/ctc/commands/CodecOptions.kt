@@ -64,6 +64,12 @@ class CodecOptions : OptionGroup(
                     "This will be generated when encrypting, and is required when decrypting."
         }
 
+    private val mac by option("-m", "--mac", metavar = "hex")
+        .help {
+            "The mac for encrypted codes, in hex format. Must be 8 bytes (64 bits). " +
+                    "This will be generated when encrypting, and is required when decrypting."
+        }
+
     /**
      * If dh is not enabled, treat key as utf8 string and apply sha3 256 as the encryption key.
      *
@@ -88,4 +94,9 @@ class CodecOptions : OptionGroup(
         ?.replace(" ", "")
         ?.decodeHex()
         ?.apply { require(this.size == 12) { "nonce must be 12 bytes (96 bits)" } }
+
+    fun getMac(): ByteArray? = mac
+        ?.replace(" ", "")
+        ?.decodeHex()
+        ?.apply { require(this.size == 8) { "mac must be 8 bytes (64 bits)" } }
 }

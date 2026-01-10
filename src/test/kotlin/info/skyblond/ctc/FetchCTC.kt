@@ -3,12 +3,12 @@ package info.skyblond.ctc
 import org.jsoup.Jsoup
 import java.io.File
 
-object Fetch {
+object FetchCTC {
     @JvmStatic
     fun main(args: Array<String>) {
         val body = Jsoup
             .connect("https://en.wiktionary.org/wiki/Appendix:Chinese_telegraph_code/Mainland_1983")
-            .proxy("127.0.0.1", 1081)
+            .proxy("127.0.0.1", 2080)
             .get().body()
         val map = body.getElementsByTag("tbody").flatMap { tbody ->
             tbody.getElementsByTag("td").mapNotNull { td ->

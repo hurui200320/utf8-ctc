@@ -1,6 +1,10 @@
 package info.skyblond.ctc
 
+import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.crypto.engines.ChaCha7539Engine
+import org.bouncycastle.crypto.generators.HKDFBytesGenerator
+import org.bouncycastle.crypto.macs.SipHash
+import org.bouncycastle.crypto.params.HKDFParameters
 import org.bouncycastle.crypto.params.KeyParameter
 import org.bouncycastle.crypto.params.ParametersWithIV
 import org.bouncycastle.util.Pack
@@ -65,4 +69,31 @@ fun generateNonce(): ByteArray {
     val p2 = Pack.intToBigEndian(SecureRandom().nextInt())
 
     return p1 + p2
+}
+
+/**
+ * Generate a 128bit key from the given 32-byte key for SipHash.
+ * */
+fun ByteArray.hkdfSipHashKey(): ByteArray {
+    require(this.size == 32) { "Key must be 32 bytes (256 bits)" }
+    val hkdf = HKDFBytesGenerator(SHA256Digest())
+    val params = HKDFParameters(this, null, "SipHash".encodeToByteArray())
+    hkdf.init(params)
+    val output = ByteArray(16)
+    hkdf.generateBytes(output, 0, 16)
+    return output
+}
+
+/**
+ * Calculate SipHash MAC for the give list of CTC code.
+ * */
+fun List<Int>.sipHash(key: ByteArray): ByteArray {
+    require(key.size == 16) { "Key must be 16 bytes (128 bits)" }
+    val mac = SipHash()
+    mac.init(KeyParameter(key))
+
+    for (i in this) {
+        mac.update(Pack.shortToBigEndian( i.toShort()), 0, 2)
+    }
+    return Pack.longToBigEndian(mac.doFinal())
 }

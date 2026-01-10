@@ -20,8 +20,8 @@ import kotlin.math.absoluteValue
  * Return: Code to Char.
  * */
 fun loadCTC(): Map<Int, String> =
-    object {}.javaClass.getResourceAsStream("/ctc.txt")!!.use {
-        it.reader().readLines()
+    object {}.javaClass.getResourceAsStream("/ctc.txt")!!.use { ins ->
+        ins.reader().readLines().filterNot { it.isBlank() || it.startsWith("#") }
     }.associate {
         it.take(4).toInt() to it.drop(4)
     }
