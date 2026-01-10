@@ -90,7 +90,7 @@ So don't worry if you accidentally typed a letter or something.
 Keep typing numbers and you're good.
 
 ```bash
-./ctc decode -t "1131, 0561, 2676, 7230, 4767, 9976, 5363, 5212, 0701, 5934, 1226, 9975"
+./ctc decode -t "1131  0561  2676  7230  4767  9976  5363  5212  0701  5934  1226  9975   84"
 ```
 
 ### Encryption
@@ -109,7 +109,8 @@ When decrypting, the same stream of fake codes will be generated using the same 
 code = (enc - key + 10000) % 10000
 ```
 
-The nonce will be generated at the encrypting time, and is required via cli option `--nonce` (`-n` for short).
+The nonce will be generated at the encrypting time,
+and is required via cli option `--nonce` (`-n` for short) during the decrypting time.
 
 The key (`-k` or `--key`) will be decoded differently depending on the encryption mode.
 
@@ -123,6 +124,9 @@ The result will be the ChaCha20 stream key.
 
 For asymmetric encryption, to generate the private key, use `openssl rand -hex 32`.
 To get the public key, use `./ctc pubkey <your private key in hex>` to calculate the public key.
+
+When encryption is enabled, the program will also generate an MAC to ensure the integrity of the message.
+This will be generated on encrypting time, and will be required on decrypting time via `--mac hex` (`-m` for short).
 
 ## Internal design
 

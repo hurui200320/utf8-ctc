@@ -32,10 +32,13 @@ object EncodeCommand : CliktCommand(
         val secret = codecOptions.getSecret()
         if (secret != null) {
             val nonce = generateNonce()
+            val sipHashKey = secret.hkdfSipHashKey()
             echo("Nonce = ${nonce.toHexString().uppercase().chunked(4).joinToString(" ")}")
             codes = codes.asSequence().encrypt(
                 createChacha20CodeSeq(secret, nonce)
             ).toList()
+            val mac = codes.sipHash(sipHashKey)
+            echo("MAC = ${mac.toHexString().uppercase().chunked(4).joinToString(" ")}")
         }
 
         codes.toCTCString().let { s ->
